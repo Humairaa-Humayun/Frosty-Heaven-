@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Frosty Heaven</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:linear-gradient(to right,#ffe6f7,#e6f7ff);
+    text-align:center;
+}
+
+header{
+    background:#ff1493;
+    color:white;
+    padding:20px;
+}
+
+.logo{ font-size:50px; }
+
+.timing{
+    background:white;
+    padding:10px;
+    font-weight:bold;
+}
+
+.menu-section{
+    padding:20px;
+    background:white;
+    margin:20px;
+    border-radius:15px;
+}
+
+table{
+    width:100%;
+    max-width:700px;
+    margin:auto;
+    border-collapse:collapse;
+}
+
+th, td{
+    border:1px solid #999;
+    padding:10px;
+}
+
+th{
+    background:#ff1493;
+    color:white;
+}
+
+tr:nth-child(even){
+    background:#f9f9f9;
+}
+
+input[type="number"]{
+    width:60px;
+    padding:5px;
+    border-radius:5px;
+    border:1px solid gray;
+}
+
+button{
+    padding:10px 20px;
+    border:none;
+    background:#ff1493;
+    color:white;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:15px;
+}
+
+.print-btn{ background:#28a745; }
+.pdf-btn{ background:#007bff; }
+
+.bill{
+    background:#fff;
+    padding:20px;
+    margin:20px auto;
+    border-radius:15px;
+    display:none;
+    max-width:400px;
+    box-shadow:0 5px 10px rgba(0,0,0,0.2);
+}
+
+footer{
+    background:#ff1493;
+    color:white;
+    padding:10px;
+}
+</style>
+
+<script>
+
+let items = [
+{ name:"🍦 Vanilla Ice Cream", price:50 },
+{ name:"🍫 Chocolate Ice Cream", price:60 },
+{ name:"🍓 Strawberry Ice Cream", price:70 },
+{ name:"🥭 Mango Ice Cream", price:65 },
+{ name:"🍯 Butterscotch Ice Cream", price:75 },
+{ name:"🎂 Ice Cream Cake", price:150 },
+{ name:"🍰 Chocolate Cake", price:130 },
+{ name:"🥤 Milk Shake", price:90 },
+{ name:"🥤 Oreo Shake", price:110 },
+{ name:"🍫 Brownie", price:100 },
+{ name:"🍟 French Fries", price:80 },
+{ name:"🥟 Veg Puff", price:40 },
+{ name:"🍨 Ice Cream Combo", price:200 }
+];
+
+function loadMenu(){
+    let table = `
+    <tr>
+        <th>Item</th>
+        <th>Price (₹)</th>
+        <th>Quantity</th>
+    </tr>`;
+
+    items.forEach((item,index)=>{
+        table+=`
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.price}</td>
+            <td><input type="number" id="qty${index}" min="0"></td>
+        </tr>`;
+    });
+
+    document.getElementById("menuTable").innerHTML=table;
+}
+
+function generateBill(){
+
+    let name=document.getElementById("name").value;
+    if(name==""){
+        alert("Enter customer name");
+        return;
+    }
+
+    let total=0;
+    let bill="<h3>🍨✨ Frosty Heaven</h3>";
+    bill+="<p><b>Date:</b> "+new Date().toLocaleString()+"</p>";
+    bill+="<p><b>Customer:</b> "+name+"</p><hr>";
+
+    let selected=false;
+
+    items.forEach((item,index)=>{
+        let qty=parseInt(document.getElementById("qty"+index).value);
+        if(qty>0){
+            selected=true;
+            let itemTotal=item.price*qty;
+            total+=itemTotal;
+            bill+=`<p>${item.name} x ${qty} = ₹${itemTotal}</p>`;
+        }
+    });
+
+    if(!selected){
+        alert("Enter quantity for at least one item");
+        return;
+    }
+
+    bill+="<hr><h2>Total: ₹"+total+"</h2>";
+    bill+="<p>✨ Thank You! Visit Again ✨</p>";
+
+    document.getElementById("billDetails").innerHTML=bill;
+    document.getElementById("bill").style.display="block";
+}
+
+function printBill(){ window.print(); }
+
+async function downloadPDF(){
+    const { jsPDF } = window.jspdf;
+    var doc = new jsPDF();
+    var text = document.getElementById("billDetails").innerText;
+    doc.text(text,10,10);
+    doc.save("Frosty_Heaven_Bill.pdf");
+}
+
+</script>
+
+</head>
+
+<body onload="loadMenu()">
+
+<header>
+<div class="logo">🍨✨</div>
+<h1>Frosty Heaven</h1>
+<p>Fresh • Tasty • Colourful</p>
+</header>
+
+<div class="timing">
+⏰ Shop Timings: 10:00 AM – 10:00 PM
+</div>
+
+<div class="menu-section">
+
+<h2>Menu Card</h2>
+
+<input type="text" id="name" placeholder="Enter Customer Name"><br><br>
+
+<table id="menuTable"></table>
+
+<button onclick="generateBill()">Generate Bill</button><br>
+
+</div>
+
+<div class="bill" id="bill">
+<div id="billDetails"></div>
+</div>
+
+<footer>
+© 2026 Frosty Heaven | Chennai
+</footer>
+
+</body>
+</html>
